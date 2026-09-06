@@ -1,3 +1,21 @@
+const tasks = [
+  {
+    id: 1,
+    title: "Finish your assignment",
+    done: false,
+  },
+  {
+    id: 2,
+    title: "Go to gym",
+    done: true,
+  },
+  {
+    id: 3,
+    title: "Call John",
+    done: false,
+  },
+];
+
 const express = require("express");
 const app = express();
 const port = 3009;
@@ -9,7 +27,25 @@ app.get("/", (req, res) => {
     endpoints: ["/tasks"],
   });
 });
+(app.get("/health", (req, res) => {
+  res.json({ status: "ok" });
+}),
+  app.get("/tasks", (req, res) => {
+    res.json({ tasks });
+  }));
 
+app.get("/tasks/:id", (req, res) => {
+  const id = Number(req.params.id);
+
+  const task = tasks.find((task) => task.id === id);
+
+  if (!task) {
+    return res.status(404).json({
+      error: `Task ${id} not found`,
+    });
+  }
+  res.json(task);
+});
 app.listen(port, () => {
   console.log(`server is running on port ${port}`);
 });
