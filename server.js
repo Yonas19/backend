@@ -20,6 +20,9 @@ const { error } = require("console");
 const express = require("express");
 const app = express();
 const port = 3009;
+
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("./openapi.json");
 app.use(express.json());
 
 app.get("/", (req, res) => {
@@ -50,15 +53,15 @@ app.get("/tasks/:id", (req, res) => {
 });
 
 app.post("/tasks", (req, res) => {
-    const { title } = req.body;
-    
+  const { title } = req.body;
+
   if (!title || title.trim() === "") {
     return res.status(400).json({
       error: "Title is required",
     });
   }
 
-    const nextId = tasks.length + 1;
+  const nextId = tasks.length + 1;
   const newTask = {
     id: nextId,
     title: title.trim(),
@@ -68,10 +71,6 @@ app.post("/tasks", (req, res) => {
   tasks.push(newTask);
   return res.status(201).json(newTask);
 });
-
-
-
-
 
 app.put("/tasks/:id", (req, res) => {
   const id = Number(req.params.id);
@@ -86,14 +85,12 @@ app.put("/tasks/:id", (req, res) => {
 
   const { title, done } = req.body;
 
-
   if (title === undefined && done === undefined) {
     return res.status(400).json({
       error: "Provide title or done",
     });
   }
 
- 
   if (
     title !== undefined &&
     (typeof title !== "string" || title.trim() === "")
@@ -103,7 +100,6 @@ app.put("/tasks/:id", (req, res) => {
     });
   }
 
- 
   if (done !== undefined && typeof done !== "boolean") {
     return res.status(400).json({
       error: "Done must be true or false",
@@ -121,8 +117,6 @@ app.put("/tasks/:id", (req, res) => {
   return res.status(200).json(task);
 });
 
-
-
 app.delete("/tasks/:id", (req, res) => {
   const id = Number(req.params.id);
 
@@ -139,9 +133,9 @@ app.delete("/tasks/:id", (req, res) => {
   return res.status(204).send();
 });
 
+
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 app.listen(port, () => {
   console.log(`server is running on port ${port}`);
 });
-
-
-
